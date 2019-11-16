@@ -1,0 +1,194 @@
+---
+pipeline:
+  name: stream
+transform:
+  image: suneetamall/pykubectl:1.14.7
+  cmd:
+  - "/bin/bash"
+  stdin:
+  - "wget -O images.tar.gz https://www.robots.ox.ac.uk/~vgg/data/pets/data/images.tar.gz && \
+     wget -O annotations.tar.gz https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz && \
+     tar -cvf data.tar.gz *.tar.gz && \
+     cat data.tar.gz > /pfs/out && \
+     while :; do sleep 2073600; done"
+spout:
+  overwrite: true
+---
+input:
+  pfs:
+    glob: /
+    repo: stream
+pipeline:
+  name: warehouse
+transform:
+  cmd:
+  - "/bin/bash"
+  image: suneetamall/e2e-ml-on-k8s:1
+  stdin:
+  - "python download_petset.py --input /pfs/stream/ --output /pfs/out"
+datum_tries: 2
+#standby: true
+---
+input:
+  pfs:
+    glob: "/"
+    repo: warehouse
+pipeline:
+  name: transform
+transform:
+  cmd:
+  - "/bin/bash"
+  image: suneetamall/e2e-ml-on-k8s:1
+  stdin:
+  - "python dataset_gen.py --input /pfs/warehouse --output /pfs/out"
+datum_tries: 2
+#standby: true
+---
+input:
+  pfs:
+    glob: "/"
+    repo: transform
+pipeline:
+  name: train
+transform:
+  cmd:
+  - "/bin/bash"
+  image: suneetamall/e2e-ml-on-k8s:1
+  stdin:
+  - "python train.py --input /pfs/transform --output /pfs/out --checkpoint_path /pfs/out/ckpts --tensorboard_path /pfs/out"
+resource_requests:
+  memory: 2G
+#  gpu:
+#    type: nvidia.com/gpu
+#    number: 1
+datum_tries: 2
+#standby: true
+---
+input:
+  pfs:
+    glob: "/"
+    repo: transform
+pipeline:
+  name: tune
+transform:
+  cmd:
+  - "/bin/bash"
+  image: suneetamall/e2e-ml-on-k8s:1
+  stdin:
+  - "python tune.py --input /pfs/transform --output /pfs/out"
+resource_requests:
+  memory: 4G
+  cpu: 1
+#  gpu:
+#    type: nvidia.com/gpu
+#    number: 1
+datum_tries: 2
+#standby: true
+---
+input:
+  cross:
+    - pfs:
+       glob: "/"
+       repo: transform
+    - pfs:
+        glob: "/optimal_hp.json"
+        repo: tune
+pipeline:
+  name: model
+transform:
+  cmd:
+  - "/bin/bash"
+  image: suneetamall/e2e-ml-on-k8s:1
+  stdin:
+  - "python train.py --input /pfs/transform --hyperparam_fn_path /pfs/tune/optimal_hp.json
+     --output /pfs/out --checkpoint_path /pfs/out/ckpts --tensorboard_path /pfs/out"
+  - "ln -s /pfs/tune/optimal_hp.json /pfs/out/optimal_hp.json"
+resource_requests:
+  memory: 2G
+#  gpu:
+#    type: nvidia.com/gpu
+#    number: 1
+datum_tries: 2
+#standby: true
+---
+input:
+  cross:
+    - pfs:
+       glob: "/calibration"
+       repo: transform
+    - pfs:
+        glob: "/model.h5"
+        repo: model
+pipeline:
+  name: calibrate
+transform:
+  cmd:
+  - "/bin/bash"
+  image: suneetamall/e2e-ml-on-k8s:1
+  stdin:
+  - "python calibrate.py --input /pfs/transform --model_weight /pfs/model/model.h5 --output /pfs/out"
+  - "ln -s /pfs/model/model.h5 /pfs/out/model.h5"
+datum_tries: 2
+#standby: true
+---
+input:
+  cross:
+    - pfs:
+       glob: "/test"
+       repo: transform
+    - pfs:
+        glob: "/"
+        repo: calibrate
+pipeline:
+  name: evaluate
+transform:
+  cmd:
+  - "/bin/bash"
+  image: suneetamall/e2e-ml-on-k8s:1
+  stdin:
+  - "papermill evaluate.ipynb /pfs/out/Report.ipynb \
+      -p model_weights /pfs/calibrate/model.h5 \
+      -p calibration_weights /pfs/calibrate/calibration.weights \
+      -p input_data_dir /pfs/transform \
+      -p out_dir /pfs/out \
+      -p hyperparameters /pfs/calibrate/optimal_hp.json"
+  - "ln -s /pfs/calibrate/model.h5 /pfs/out/model.h5"
+  - "ln -s /pfs/calibrate/calibration.weights /pfs/out/calibration.weights"
+resource_requests:
+  memory: 1G
+datum_tries: 2
+#standby: true
+---
+input:
+  pfs:
+    glob: "/"
+    repo: evaluate
+pipeline:
+  name: release
+transform:
+  cmd:
+  - "/bin/bash"
+  image: suneetamall/e2e-ml-on-k8s:1
+  stdin:
+  - "python release.py --model_db evaluate --input /pfs/evaluate/evaluation_result.csv --version ${evaluate_COMMIT}"
+pod_spec: '{"serviceAccount": "ml-user", "serviceAccountName": "ml-user"}'
+datum_tries: 2
+#standby: true
+---
+## Service https://docs.pachyderm.io/en/1/concepts/pipeline-concepts/pipeline/service.html
+input:
+  pfs:
+    glob: "/"
+    repo: model
+pipeline:
+  name: tensorboard
+service:
+  external_port: 30888
+  internal_port: 6006
+transform:
+  cmd:
+  - "/bin/bash"
+  stdin:
+  - tensorboard --logdir=/pfs/model/
+  image: suneetamall/e2e-ml-on-k8s:1
+---

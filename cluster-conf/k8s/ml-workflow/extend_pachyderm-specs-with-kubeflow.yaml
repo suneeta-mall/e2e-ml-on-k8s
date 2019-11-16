@@ -1,0 +1,45 @@
+---
+input:
+  pfs:
+    glob: "/"
+    empty_files: true
+    repo: transform
+pipeline:
+  name: tune-kf
+transform:
+  cmd:
+  - "/bin/bash"
+  image: suneetamall/e2e-ml-on-k8s:1
+  stdin:
+  - "python tune_katib.py --input /pfs/transform --output /pfs/out"
+pod_spec: '{"serviceAccount": "ml-user", "serviceAccountName": "ml-user"}'
+datum_tries: 2
+#standby: true
+
+---
+
+input:
+  cross:
+    - pfs:
+       glob: "/"
+       repo: transform
+    - pfs:
+        glob: "/optimal_hp.json"
+        repo: tune-kf
+pipeline:
+  name: model-kf
+transform:
+  cmd:
+  - "/bin/bash"
+  image: suneetamall/e2e-ml-on-k8s:1
+  stdin:
+  - "python train.py --input /pfs/transform --hyperparam_fn_path /pfs/tune-kf/optimal_hp.json
+     --output /pfs/out --checkpoint_path /pfs/out/ckpts --tensorboard_path /pfs/out"
+resource_requests:
+  memory: 2G
+#  gpu:
+#    type: nvidia.com/gpu
+#    number: 1
+datum_tries: 2
+#standby: true
+---

@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ml-user
+  namespace: kubeflow
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ml-user
+  namespace: kubeflow
+rules:
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - experiments
+  - experiments/status
+  - trials
+  - trials/status
+  verbs:
+  - "*"
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - tfjobs
+  - pytorchjobs
+  verbs:
+  - "*"
+- apiGroups:
+  - machinelearning.seldon.io
+  resources:
+  - seldondeployments
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+#  - update
+#  - patch
+#  - delete
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/log
+  - endpoints
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods/portforward
+  verbs:
+  - get
+  - list
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ml-user
+  namespace: kubeflow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ml-user
+subjects:
+- kind: ServiceAccount
+  name: ml-user
+  namespace: kubeflow

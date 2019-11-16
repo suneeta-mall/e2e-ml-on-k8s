@@ -1,0 +1,131 @@
+apiVersion: "kubeflow.org/v1alpha2"
+kind: Experiment
+metadata:
+  namespace: kubeflow
+  name: tune-{short_commit_id}
+  labels:
+    app: {commit_id}
+spec:
+  parallelTrialCount: 9
+  maxTrialCount: 9
+  maxFailedTrialCount: 9
+  objective:
+    type: maximize
+    goal: 0.912
+    objectiveMetricName: val_binary_accuracy
+    additionalMetricNames:
+      - val_f1_score
+      - val_iou_score
+  algorithm:
+    algorithmName: hyperband
+    algorithmSettings:
+      - name: "resourceName"
+        value: "--epochs"
+      - name: "eta"
+        value: "3"
+      - name: "r_l"
+        value: "9"
+  parameters:
+    - name: --model_arch
+      parameterType: categorical
+      feasibleSpace:
+        list:
+        - VGG19
+        - MobileNetV2
+    - name: --batch_size
+      parameterType: int
+      feasibleSpace:
+        min: "60"
+        max: "81"
+    - name: --epochs
+      parameterType: int
+      feasibleSpace:
+        min: "6"
+        max: "13"
+    - name: --steps_per_epoch
+      parameterType: int
+      feasibleSpace:
+        min: "80"
+        max: "90"
+    - name: --learning_rate
+      parameterType: double
+      feasibleSpace:
+        min: "0.001"
+        max: "0.01"
+  trialTemplate:
+    goTemplate:
+        rawTemplate: |-
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: {{{{.Trial}}}}
+            namespace: {{{{.NameSpace}}}}
+          spec:
+            template:
+              metadata:
+                annotations:
+                  sidecar.istio.io/inject: "false"
+              spec:
+                containers:
+                - name: {{{{.Trial}}}}
+                  image: suneetamall/e2e-ml-on-k8s:{version}
+                  command:
+                  - "python"
+                  - "train.py"
+                  - "--force-download"
+                  - "--input={input}"
+                  - "--output=/pfs/out"
+                  {{{{- with .HyperParameters}}}}
+                  {{{{- range .}}}}
+                  - "{{{{.Name}}}}={{{{.Value}}}}"
+                  {{{{- end}}}}
+                  {{{{- end}}}}
+                  env:
+                  - name: FS_ADDRESS
+                    value: pachd.kubeflow.svc.cluster.local.
+                  - name: COMMIT_ID
+                    value: {input_version}
+                  resources:
+                    requests:
+                      memory: 2G
+                      cpu: 1
+                restartPolicy: Never
+  metricsCollectorSpec:
+    goTemplate:
+      rawTemplate: |-
+        apiVersion: batch/v1beta1
+        kind: CronJob
+        metadata:
+          name: {{{{.Trial}}}}
+          namespace: {{{{.NameSpace}}}}
+        spec:
+          schedule: "*/30 * * * *"
+          successfulJobsHistoryLimit: 0
+          failedJobsHistoryLimit: 1
+          jobTemplate:
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    sidecar.istio.io/inject: "false"
+                spec:
+                  containers:
+                  - name: {{{{.Trial}}}}
+                    image: gcr.io/kubeflow-images-public/katib/v1alpha2/metrics-collector:v0.1.2-alpha-289-g14dad8b
+                    imagePullPolicy: IfNotPresent
+                    command: ["./metricscollector"]
+                    args:
+                    - "-e"
+                    - "{{{{.Experiment}}}}"
+                    - "-t"
+                    - "{{{{.Trial}}}}"
+                    - "-k"
+                    - "{{{{.JobKind}}}}"
+                    - "-n"
+                    - "{{{{.NameSpace}}}}"
+                    - "-m"
+                    - "{{{{.ManagerService}}}}"
+                    - "-mn"
+                    - "{{{{.MetricNames}}}}"
+                  restartPolicy: Never
+                  serviceAccountName: metrics-collector

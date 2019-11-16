@@ -1,0 +1,740 @@
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: namespace
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/namespace
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: api-service
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/api-service
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: application
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/application
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: application-crds
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/application-crds
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/argo
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bootstrap
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/bootstrap
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: centraldashboard
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/centraldashboard
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istio
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/istio
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istio-crds
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/istio-crds
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istio-install
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/istio-install
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jupyter-web-app
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/jupyter-web-app
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: katib-controller
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/katib-controller
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: katib-db
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/katib-db
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: katib-manager
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/katib-manager
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: katib-ui
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/katib-ui
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metacontroller
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/metacontroller
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metadata
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/metadata
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metrics-collector
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/metrics-collector
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/minio
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mysql
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/mysql
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: notebook-controller
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/notebook-controller
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: persistent-agent
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/persistent-agent
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pipelines-runner
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/pipelines-runner
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pipelines-ui
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/pipelines-ui
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pipelines-viewer
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/pipelines-viewer
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: profiles
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/profiles
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pytorch-job-crds
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/pytorch-job-crds
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pytorch-operator
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/pytorch-operator
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: scheduledworkflow
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/scheduledworkflow
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: seldon-core-operator
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/seldon-core-operator
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: spartakus
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/spartakus
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: suggestion
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/suggestion
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tensorboard
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/tensorboard
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tf-job-operator
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/tf-job-operator
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webhook
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/kubeflow/kustomize/webhook
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pachyderm
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/pachyderm
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ml-user
+  namespace: argocd
+spec:
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true   
+  source:
+    repoURL: https://github.com/suneeta-mall/e2e-ml-on-k8s.git
+    targetRevision: HEAD
+    path: cluster-conf/ml-user
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow

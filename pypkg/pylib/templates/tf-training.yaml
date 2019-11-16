@@ -1,0 +1,35 @@
+apiVersion: kubeflow.org/v1
+kind: TFJob
+metadata:
+  generateName: tfjob
+  namespace: kubeflow
+spec:
+  tfReplicaSpecs:
+    PS:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        spec:
+          containers:
+          - name: tensorflow
+            image: gcr.io/your-project/your-image
+            command:
+              - python
+              - -m
+              - trainer.task
+              - --batch_size=32
+              - --training_steps=1000
+    Worker:
+      replicas: 3
+      restartPolicy: OnFailure
+      template:
+        spec:
+          containers:
+          - name: tensorflow
+            image: gcr.io/your-project/your-image
+            command:
+              - python
+              - -m
+              - trainer.task
+              - --batch_size=32
+              - --training_steps=1000

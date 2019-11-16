@@ -1,0 +1,22 @@
+{
+    "features":[
+	{
+	    "name":"x",
+	    "dtype":"FLOAT",
+	    "ftype":"continuous",
+	    "range":[0,1],
+	    "shape":[128,128,3]
+	}
+    ],
+    "targets":[
+	{
+	    "name":"prediction",
+	    "dtype":"FLOAT",
+	    "ftype":"continuous",
+	    "range":[0,1],
+	    "shape":[128,128,3]
+	}
+    ]
+}
+
+

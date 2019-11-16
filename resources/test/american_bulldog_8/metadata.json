@@ -1,0 +1,12 @@
+
+{
+    "features": {
+      "feature": {
+         "Breed": { "int64_list": { value: [1] } },
+         "ClassId": { "int64_list": { value: [2] } },
+         "Species": { "int64_list": { value: [2] } },
+         "ClassName": { "bytes_list": { value: ["YW1lcmljYW5fYnVsbGRvZw=="] } }
+      }
+    }
+}
+                    

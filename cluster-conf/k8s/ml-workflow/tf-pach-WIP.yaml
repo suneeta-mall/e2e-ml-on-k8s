@@ -1,0 +1,45 @@
+# https://github.com/kubeflow/katib/blob/master/examples/v1alpha3/tfjob-example.yaml
+# https://github.com/pachyderm/pachyderm/blob/ca11e11287bb2b083c91c1b8a48e3af40a90c069/src/server/pps/cmds/cmds_test.go
+# https://www.kubeflow.org/docs/components/training/tftraining/
+pipeline:
+  name: first
+input:
+  pfs:
+    glob: /*
+    repo: input
+tf_job:
+  apiVersion: kubeflow.org/v1
+  kind: TFJob
+  metadata:
+    generateName: tfjob
+    namespace: kubeflow
+  spec:
+    tfReplicaSpecs:
+      PS:
+        replicas: 1
+        restartPolicy: OnFailure
+        template:
+          spec:
+            containers:
+            - name: tensorflow
+              image: gcr.io/kubeflow-ci/tf-mnist-with-summaries:1.0
+              command:
+                - "python"
+                - "/var/tf_mnist/mnist_with_summaries.py"
+                - "--log_dir=/train/metrics"
+                - "--learning_rate=0.01"
+                - "--batch_size=100"
+      Worker:
+        replicas: 3
+        restartPolicy: OnFailure
+        template:
+          spec:
+            containers:
+            - name: tensorflow
+              image: gcr.io/kubeflow-ci/tf-mnist-with-summaries:1.0
+              command:
+                - "python"
+                - "/var/tf_mnist/mnist_with_summaries.py"
+                - "--log_dir=/train/metrics"
+                - "--learning_rate=0.01"
+                - "--batch_size=100"

@@ -1,0 +1,51 @@
+---
+apiVersion: machinelearning.seldon.io/v1alpha2
+kind: SeldonDeployment
+metadata:
+  labels:
+    app: {version}
+  name: petset-{short_version}
+spec:
+  annotations:
+    project_name: Pet Semantic Segmentation
+    deployment_version: v1
+  name: petset-{short_version}
+  oauth_key: oauth-key
+  oauth_secret: oauth-secret
+  predictors:
+    - componentSpecs:
+        - spec:
+            containers:
+              - image: suneetamall/e2e-ml-on-k8s:{container_version}
+                imagePullPolicy: IfNotPresent
+                name: segmenter
+                resources:
+                  requests:
+                    memory: 1Mi
+                env:
+                  - name: MODEL_DB
+                    value: {model_db}
+                  - name: MODEL_VERSION
+                    value: {version}
+                  - name: MODEL_STORE_ADDRESS
+                    value: pachd.kubeflow.svc.cluster.local.
+#                livenessProbe:
+#                  failureThreshold: 3
+#                  initialDelaySeconds: 300
+#                  periodSeconds: 30
+#                  successThreshold: 1
+#                  tcpSocket:
+#                    port: http
+            terminationGracePeriodSeconds: 20
+      graph:
+        children: []
+        name: segmenter
+        endpoint:
+          type: REST
+        type: MODEL
+#      labels:
+#        version: v1
+      name: single-model
+      replicas: 1
+      annotations:
+        predictor_version: v1

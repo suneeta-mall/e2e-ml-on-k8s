@@ -1,0 +1,81 @@
+version: 2
+
+infer_version: &infer_version
+  run:
+    name: Infer Version
+    command: |
+      echo 'export VERSION=$(echo ${CIRCLE_SHA1:-latest} | cut -c1-6)' >> $BASH_ENV
+
+docker_login: &docker_login
+  run:
+    name: Docker login
+    command: |
+      echo docker login -u suneetamall -p $DOCKERHUB_PASSWORD
+
+
+jobs:
+  build:
+    docker:
+      - image: nearmap/conda-ce
+    working_directory: ~/e2e-ml-on-k8s
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+          name: Code Quality Checks
+          command: |
+            pylint-fail-under --fail_under 10.0 --rcfile=/.pylintrc app/*.py pypkg/pylib
+      - *infer_version
+      - run:
+          name: Build Docker Container
+          command: |
+            make build version=${VERSION}
+      - run:
+          name: E2E Test
+          command: |
+            echo "One day I will do something"
+      - *docker_login
+      - run:
+          name: Push Docker Container
+          command: |
+            echo make push version=${VERSION}
+
+  patch-config:
+    docker:
+      - image: nearmap/conda-ce
+    working_directory: ~/e2e-ml-on-k8s
+    steps:
+      - setup_remote_docker
+      - *infer_version
+      # https://circleci.com/docs/2.0/gh-bb-integration/#creating-a-github-user-key
+      - add_ssh_keys:
+          fingerprints:
+            - "0b:e9:a6:c2:c1:0e:82:c3:cc:9b:b3:f2:e5:8b:70:2b"
+      - run:
+          name: Patch Config Files
+          command: |
+            echo "update config"
+#            kustomize edit set image suneetamall/e2e-ml-on-k8s:${VERSION}
+#            git add cluster-conf/k8s/pipelines/kustomization.yaml
+#            # https://circleci.com/docs/2.0/skip-build/
+#            git commit -m "Deploying new version [ci skip]"
+#            git push -u origin master
+
+workflows:
+  version: 2
+  release-branch-workflow:
+    jobs:
+      - build
+      - release-approval:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - patch-config:
+          requires:
+            - release-approval
+          filters:
+            branches:
+              only: master

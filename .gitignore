@@ -1,0 +1,39 @@
+# Compiled python modules.
+*.pyc
+__pycache__
+
+# Setuptools distribution folder.
+/dist/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+*.egg-info
+*.tar.bz2
+
+record.txt
+build/
+dist
+
+*.csv
+.idea
+.idea/*
+.DS_Store
+
+.ipynb_checkpoints
+.vscode
+
+temp
+pfs
+pfs/*
+data
+logs
+tf_data
+log
+.pylintrc
+
+
+tf-data
+confidentials
+out
+apollo-experiments
+other-ex
