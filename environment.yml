@@ -2,7 +2,7 @@ name: tf2
 channels:
   - pytorch
   - conda-forge
-  - https://conda.anaconda.org/t/Ne-1f5cce6c-f02b-4a80-9f6b-e6805a943260/nearmap
+  - https://conda.anaconda.org/t/xxxxxxxx/nearmap
   - defaults
 dependencies:
   - ansiwrap=0.8.4=py_0
